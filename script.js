@@ -240,38 +240,57 @@ const closeModalImg = document.getElementById('close-modal-img');
 function renderSlides() {
     if (!slideshowTrack) return;
     slideshowTrack.innerHTML = '';
-    // Show 5 slides: [far left, left, active, right, far right]
-    // Infinite loop: wrap indices
     const total = slideshowImages.length;
-    const getIndex = (offset) => (slideshowCurrent + offset + total) % total;
-    const positions = [-2, -1, 0, 1, 2];
-    positions.forEach(offset => {
-        const idx = getIndex(offset);
-        const imgObj = slideshowImages[idx];
+    const isMobile = window.innerWidth <= 700;
+
+    if (isMobile) {
+        // Only render the active slide (one image in DOM)
+        const imgObj = slideshowImages[slideshowCurrent];
         const slide = document.createElement('div');
-        slide.className = 'slideshow-slide';
-        if (offset === 0) slide.classList.add('active');
-        else if (offset === -1) slide.classList.add('left');
-        else if (offset === 1) slide.classList.add('right');
-        else slide.classList.add('far');
-        slide.setAttribute('data-index', idx);
+        slide.className = 'slideshow-slide active';
+        slide.setAttribute('data-index', slideshowCurrent);
         const img = document.createElement('img');
         img.src = imgObj.src;
         img.alt = imgObj.projectTitle;
         slide.appendChild(img);
-        // Clickable if not active
-        if (offset !== 0) {
-            slide.addEventListener('click', () => {
-                goToSlide(idx);
-            });
-        } else {
-            // Active image click: open fullscreen modal
-            slide.addEventListener('click', () => {
-                openSlideshowImageModal(imgObj.src, imgObj.projectTitle);
-            });
-        }
+        slide.addEventListener('click', () => {
+            openSlideshowImageModal(imgObj.src, imgObj.projectTitle);
+        });
         slideshowTrack.appendChild(slide);
-    });
+    } else {
+        // Show 5 slides: [far left, left, active, right, far right]
+        // Infinite loop: wrap indices
+        const total = slideshowImages.length;
+        const getIndex = (offset) => (slideshowCurrent + offset + total) % total;
+        const positions = [-2, -1, 0, 1, 2];
+        positions.forEach(offset => {
+            const idx = getIndex(offset);
+            const imgObj = slideshowImages[idx];
+            const slide = document.createElement('div');
+            slide.className = 'slideshow-slide';
+            if (offset === 0) slide.classList.add('active');
+            else if (offset === -1) slide.classList.add('left');
+            else if (offset === 1) slide.classList.add('right');
+            else slide.classList.add('far');
+            slide.setAttribute('data-index', idx);
+            const img = document.createElement('img');
+            img.src = imgObj.src;
+            img.alt = imgObj.projectTitle;
+            slide.appendChild(img);
+            // Clickable if not active
+            if (offset !== 0) {
+                slide.addEventListener('click', () => {
+                    goToSlide(idx);
+                });
+            } else {
+                // Active image click: open fullscreen modal
+                slide.addEventListener('click', () => {
+                    openSlideshowImageModal(imgObj.src, imgObj.projectTitle);
+                });
+            }
+            slideshowTrack.appendChild(slide);
+        });
+    }
     // Update info
     const active = slideshowImages[slideshowCurrent];
     slideshowInfo.innerHTML = `<span class="slideshow-project-title" style="color: #fff;">${active.projectTitle}</span>
@@ -388,3 +407,7 @@ document.addEventListener('keydown', function(e) {
 if (slideshowTrack && slideshowImages.length) {
     renderSlides();
 }
+
+window.addEventListener('resize', () => {
+    renderSlides();
+});
