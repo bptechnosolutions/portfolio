@@ -1981,7 +1981,7 @@ body {
 }
 @media (max-width: 600px) {
     .swiper-slide {
-        width: 95vw !important;
+        width: 50vw !important;
         height: 220px !important;
         max-width: 98vw;
         max-height: 220px;
