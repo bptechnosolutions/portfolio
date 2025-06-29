@@ -177,29 +177,154 @@
         </div>
     </section>
 
-    <!-- Project Slideshow Section -->
-    <section class="project-slideshow-section">
+    <!-- Project Slideshow Section with Swiper, local images, infinite scroll, coverflow, and drag -->
+    <section class="project-slideshow-section" style="padding:0;">
         <div class="container" style="max-width:100vw;padding:0;">
             <div class="slideshow-header">
                 <h2 class="slideshow-title">Project Gallery</h2>
                 <p class="slideshow-subtitle">Browse all project images in one place</p>
             </div>
-            <div class="project-slideshow" id="project-slideshow">
-                <button class="slideshow-nav prev" id="slideshow-prev" aria-label="Previous image">&#10094;</button>
-                <div class="slideshow-track" id="slideshow-track">
-                    <!-- Slides will be injected by JS -->
+            <div class="swiper" style="width:100vw;">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide" style="background-image:url(ecommerce.png)"></div>
+                    <div class="swiper-slide" style="background-image:url(ecommerce2.png)"></div>
+                    <div class="swiper-slide" style="background-image:url(ecommerce3.png)"></div>
+                    <div class="swiper-slide" style="background-image:url(delivery.jpg)"></div>
+                    <div class="swiper-slide" style="background-image:url(delivery2.png)"></div>
+                    <div class="swiper-slide" style="background-image:url(delivery3.png)"></div>
+                    <div class="swiper-slide" style="background-image:url(delivery4.png)"></div>
+                    <div class="swiper-slide" style="background-image:url(delivery5.png)"></div>
+                    <div class="swiper-slide" style="background-image:url(delivery6.png)"></div>
+                    <div class="swiper-slide" style="background-image:url(timekeeping.jpg)"></div>
+                    <div class="swiper-slide" style="background-image:url(timekeeping2.png)"></div>
+                    <div class="swiper-slide" style="background-image:url(timekeeping3.png)"></div>
+                    <div class="swiper-slide" style="background-image:url(timekeeping4.png)"></div>
+                    <div class="swiper-slide" style="background-image:url(timekeeping5.png)"></div>
+                    <div class="swiper-slide" style="background-image:url(accounting2.png)"></div>
+                    <div class="swiper-slide" style="background-image:url(accounting3.png)"></div>
+                    <div class="swiper-slide" style="background-image:url(accounting4.png)"></div>
+                    <div class="swiper-slide" style="background-image:url(pos.png)"></div>
+                    <div class="swiper-slide" style="background-image:url(pos2.jpeg)"></div>
+                    <div class="swiper-slide" style="background-image:url(pos3.jpeg)"></div>
+                    <div class="swiper-slide" style="background-image:url(pos4.jpg)"></div>
+                    <div class="swiper-slide" style="background-image:url(pos5.jpg)"></div>
+                    <div class="swiper-slide" style="background-image:url(pos6.jpg)"></div>
+                    <div class="swiper-slide" style="background-image:url(pos7.jpg)"></div>
+                    <div class="swiper-slide" style="background-image:url(pos8.jpg)"></div>
                 </div>
-                <button class="slideshow-nav next" id="slideshow-next" aria-label="Next image">&#10095;</button>
-                <div class="slideshow-info" id="slideshow-info"></div>
+                <div class="swiper-pagination"></div>
             </div>
         </div>
     </section>
-
-    <!-- Fullscreen Image Modal for Slideshow -->
-    <div id="slideshow-image-modal">
-        <button class="close-modal-img" id="close-modal-img" aria-label="Close">&times;</button>
-        <img class="modal-img" id="modal-img" src="" alt="Project Image" />
+    <!-- Fullscreen Image Modal for Swiper Gallery -->
+    <div id="gallery-image-modal" class="gallery-image-modal">
+        <button class="gallery-modal-close" id="gallery-modal-close" aria-label="Close">&times;</button>
+        <img class="gallery-modal-img" id="gallery-modal-img" src="" alt="Project Image" />
     </div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+    <script>
+    // Swiper click-to-fullscreen logic (robust click detection, only open on click, not drag)
+    function attachSwiperClickListeners() {
+        var dragThreshold = 10;
+        var modal = document.getElementById('gallery-image-modal');
+        var modalImg = document.getElementById('gallery-modal-img');
+        var closeBtn = document.getElementById('gallery-modal-close');
+        document.querySelectorAll('.swiper-slide').forEach(function(slide) {
+            let down = false, moved = false, pointerId = null;
+            let startX, startY;
+            // Remove previous listeners
+            slide.onpointerdown = null;
+            slide.onpointermove = null;
+            slide.onpointerup = null;
+            slide.onpointerleave = null;
+            // Add listeners
+            slide.onpointerdown = function(e) {
+                down = true;
+                moved = false;
+                pointerId = e.pointerId;
+                startX = e.clientX;
+                startY = e.clientY;
+            };
+            slide.onpointermove = function(e) {
+                if (!down || e.pointerId !== pointerId) return;
+                if (Math.abs(e.clientX - startX) > dragThreshold || Math.abs(e.clientY - startY) > dragThreshold) {
+                    moved = true;
+                }
+            };
+            slide.onpointerup = function(e) {
+                if (!moved && down && e.pointerId === pointerId) {
+                    var bg = this.style.backgroundImage;
+                    var url = bg.match(/url\(["']?(.*?)["']?\)/i);
+                    if (url && url[1]) {
+                        modalImg.src = url[1];
+                        modal.classList.add('active');
+                        document.body.style.overflow = 'hidden';
+                    }
+                }
+                down = false;
+                moved = false;
+                pointerId = null;
+            };
+            slide.onpointerleave = function() {
+                down = false;
+                moved = false;
+                pointerId = null;
+            };
+        });
+        if (closeBtn && modal) {
+            closeBtn.onclick = function() {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            };
+        }
+        if (modal) {
+            modal.onclick = function(e) {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            };
+        }
+        document.addEventListener('keydown', function(e) {
+            if (modal.classList.contains('active') && e.key === 'Escape') {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+    }
+    // Swiper init
+    var swiper = new Swiper(".swiper", {
+        effect: "coverflow",
+        loop: true,
+        grabCursor: true,
+        centeredSlides: true,
+        slidesPerView: "1",
+        coverflowEffect: {
+            rotate: 50, 
+            stretch: 0, 
+            depth: 100, 
+            modifier: 1, 
+            slideShadows: true 
+        },
+        pagination: {
+            el: ".swiper-pagination"
+        },
+        breakpoints: {
+            320: { slidesPerView: 1.5 },
+            580: { slidesPerView: 2 },
+            767: { slidesPerView: 3 },
+            992: { slidesPerView: 3.5 },
+            1200: { slidesPerView: 4 },
+            1400: { slidesPerView: 4.5 }
+        },
+        on: {
+            init: function() { attachSwiperClickListeners(); },
+            slideChange: function() { attachSwiperClickListeners(); },
+            observerUpdate: function() { attachSwiperClickListeners(); }
+        }
+    });
+    </script>
 
     <!-- Projects Section -->
     <section id="projects" class="projects">
@@ -329,7 +454,7 @@
                         </div>
                         <div class="contact-details">
                             <h4>Address</h4>
-                            <p>Remote</p>
+                            <p>San Pedro, Laguna</p>
                         </div>
                     </div>
                     <div class="contact-item">
@@ -351,8 +476,6 @@
                         </div>
                     </div>
                     <div class="social-links">
-                        <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
                         <a href="https://github.com/bptechnosolutions" class="social-link"><i class="fab fa-github"></i></a>
                         <a href="https://www.facebook.com/share/193CY8mRVb/?mibextid=qi2Omg" class="social-link"><i class="fab fa-facebook"></i></a>
                     </div>
@@ -408,8 +531,6 @@
                 <div class="footer-section">
                     <h4>Connect</h4>
                     <div class="footer-social">
-                        <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
                         <a href="https://github.com/bptechnosolutions" class="social-link"><i class="fab fa-github"></i></a>
                         <a href="https://www.facebook.com/share/193CY8mRVb/?mibextid=qi2Omg" class="social-link"><i class="fab fa-facebook"></i></a>
                     </div>
@@ -444,7 +565,6 @@
                 <div class="modal-info">
                     <p class="modal-description" id="modal-description">Project description goes here.</p>
                     <div class="modal-tech" id="modal-tech">
-                        <!-- Tech stack will be populated here -->
                     </div>
                 </div>
             </div>
