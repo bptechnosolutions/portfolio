@@ -1,4 +1,3 @@
-// Project data with multiple images
 const projectData = {
     ecommerce: {
         title: "E-Commerce Platform",
@@ -62,7 +61,6 @@ const projectData = {
     }
 };
 
-// Modal functionality
 let currentProject = null;
 let currentImageIndex = 0;
 
@@ -76,7 +74,6 @@ const prevBtn = document.getElementById('prev-btn');
 const nextBtn = document.getElementById('next-btn');
 const imageCounter = document.getElementById('image-counter');
 
-// Open modal
 function openModal(projectKey) {
     currentProject = projectData[projectKey];
     currentImageIndex = 0;
@@ -85,7 +82,6 @@ function openModal(projectKey) {
         modalTitle.textContent = currentProject.title;
         modalDescription.textContent = currentProject.description;
 
-        // Update tech stack
         modalTech.innerHTML = '';
         currentProject.tech.forEach(tech => {
             const span = document.createElement('span');
@@ -99,19 +95,16 @@ function openModal(projectKey) {
     }
 }
 
-// Update modal image
 function updateModalImage() {
     if (currentProject && currentProject.images) {
         modalImage.src = currentProject.images[currentImageIndex];
         imageCounter.textContent = `${currentImageIndex + 1} / ${currentProject.images.length}`;
 
-        // Update navigation buttons
         prevBtn.disabled = currentImageIndex === 0;
         nextBtn.disabled = currentImageIndex === currentProject.images.length - 1;
     }
 }
 
-// Close modal
 function closeModal() {
     modal.classList.remove('active');
     document.body.style.overflow = 'auto';
@@ -119,9 +112,7 @@ function closeModal() {
     currentImageIndex = 0;
 }
 
-// Event listeners
 document.addEventListener('DOMContentLoaded', function() {
-    // Add click event to project cards
     const viewProjectBtns = document.querySelectorAll('.view-project');
     viewProjectBtns.forEach(btn => {
         btn.addEventListener('click', function(e) {
@@ -132,11 +123,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Also allow clicking on the entire project card
     const projectCards = document.querySelectorAll('.project-card');
     projectCards.forEach(card => {
         card.addEventListener('click', function(e) {
-            // Don't trigger if clicking on external link
             if (e.target.closest('a[href]')) {
                 return;
             }
@@ -145,7 +134,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Modal close events
     modalClose.addEventListener('click', closeModal);
     modal.addEventListener('click', function(e) {
         if (e.target === modal) {
@@ -153,7 +141,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Navigation events
     prevBtn.addEventListener('click', function() {
         if (currentImageIndex > 0) {
             currentImageIndex--;
@@ -168,7 +155,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Keyboard navigation
     document.addEventListener('keydown', function(e) {
         if (modal.classList.contains('active')) {
             switch(e.key) {
@@ -191,7 +177,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Hamburger menu toggle for mobile
     const hamburger = document.getElementById('hamburger');
     const navMenu = document.getElementById('nav-menu');
     if (hamburger && navMenu) {
@@ -199,7 +184,6 @@ document.addEventListener('DOMContentLoaded', function() {
             hamburger.classList.toggle('active');
             navMenu.classList.toggle('active');
         });
-        // Optional: close menu when clicking a nav link (for better UX)
         navMenu.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', function() {
                 hamburger.classList.remove('active');
@@ -209,9 +193,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// -------- Project Slideshow Logic --------
-
-// Gather all images from all projects into a flat array with project info
 const slideshowImages = [];
 Object.entries(projectData).forEach(([key, project]) => {
     project.images.forEach((img, idx) => {
@@ -231,12 +212,10 @@ const slideshowPrev = document.getElementById('slideshow-prev');
 const slideshowNext = document.getElementById('slideshow-next');
 const slideshowInfo = document.getElementById('slideshow-info');
 
-// Fullscreen image modal elements
 const slideshowImageModal = document.getElementById('slideshow-image-modal');
 const modalImg = document.getElementById('modal-img');
 const closeModalImg = document.getElementById('close-modal-img');
 
-// Render slides
 function renderSlides() {
     if (!slideshowTrack) return;
     slideshowTrack.innerHTML = '';
@@ -244,7 +223,6 @@ function renderSlides() {
     const isMobile = window.innerWidth <= 700;
 
     if (isMobile) {
-        // Only render the active slide (one image in DOM)
         const imgObj = slideshowImages[slideshowCurrent];
         const slide = document.createElement('div');
         slide.className = 'slideshow-slide active';
@@ -258,8 +236,6 @@ function renderSlides() {
         });
         slideshowTrack.appendChild(slide);
     } else {
-        // Show 5 slides: [far left, left, active, right, far right]
-        // Infinite loop: wrap indices
         const total = slideshowImages.length;
         const getIndex = (offset) => (slideshowCurrent + offset + total) % total;
         const positions = [-2, -1, 0, 1, 2];
@@ -277,13 +253,11 @@ function renderSlides() {
             img.src = imgObj.src;
             img.alt = imgObj.projectTitle;
             slide.appendChild(img);
-            // Clickable if not active
             if (offset !== 0) {
                 slide.addEventListener('click', () => {
                     goToSlide(idx);
                 });
             } else {
-                // Active image click: open fullscreen modal
                 slide.addEventListener('click', () => {
                     openSlideshowImageModal(imgObj.src, imgObj.projectTitle);
                 });
@@ -291,13 +265,11 @@ function renderSlides() {
             slideshowTrack.appendChild(slide);
         });
     }
-    // Update info
     const active = slideshowImages[slideshowCurrent];
     slideshowInfo.innerHTML = `<span class="slideshow-project-title" style="color: #fff;">${active.projectTitle}</span>
         <span class="slideshow-image-counter" style="color: #fff;">${slideshowCurrent + 1} / ${slideshowImages.length}</span>`;
 }
 
-// Slide to a given index with smooth animation through all intermediate slides
 let isSliding = false;
 function goToSlide(targetIndex) {
     if (isSliding) return;
@@ -307,7 +279,6 @@ function goToSlide(targetIndex) {
     if (current === target) return;
 
     isSliding = true;
-    // Calculate shortest direction (handles infinite loop)
     let forwardSteps = (target - current + total) % total;
     let backwardSteps = (current - target + total) % total;
     let step, steps;
@@ -327,13 +298,11 @@ function goToSlide(targetIndex) {
         current = (current + step + total) % total;
         slideshowCurrent = current;
         renderSlides();
-        // Animate the track (CSS handles the transition)
-        setTimeout(() => animateStep(remaining - 1), 420); // match CSS transition, overlap for smoothness
+        setTimeout(() => animateStep(remaining - 1), 420);
     }
     animateStep(steps);
 }
 
-// Prev/Next infinite
 if (slideshowPrev && slideshowNext) {
     slideshowPrev.addEventListener('click', () => {
         if (isSliding) return;
@@ -345,7 +314,6 @@ if (slideshowPrev && slideshowNext) {
     });
 }
 
-// Keyboard navigation for slideshow (when not in modal)
 document.addEventListener('keydown', function(e) {
     if (
         document.activeElement.tagName !== 'INPUT' &&
@@ -361,15 +329,12 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// Fullscreen image modal logic
 function openSlideshowImageModal(src, alt) {
     if (!slideshowImageModal || !modalImg) return;
     modalImg.src = src;
     modalImg.alt = alt || '';
     slideshowImageModal.classList.add('active');
-    // Remove and re-add animation for pop-in
     modalImg.style.animation = 'none';
-    // Force reflow
     void modalImg.offsetWidth;
     modalImg.style.animation = '';
     modalImg.classList.remove('popIn');
@@ -379,7 +344,6 @@ function openSlideshowImageModal(src, alt) {
     document.body.style.overflow = 'hidden';
 }
 
-// Close modal on close button or background click
 if (closeModalImg && slideshowImageModal) {
     closeModalImg.addEventListener('click', closeSlideshowImageModal);
     slideshowImageModal.addEventListener('click', function(e) {
@@ -394,7 +358,6 @@ function closeSlideshowImageModal() {
     document.body.style.overflow = '';
 }
 
-// ESC key closes image modal
 document.addEventListener('keydown', function(e) {
     if (slideshowImageModal && slideshowImageModal.classList.contains('active')) {
         if (e.key === 'Escape') {
@@ -403,7 +366,6 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// Initial render
 if (slideshowTrack && slideshowImages.length) {
     renderSlides();
 }
